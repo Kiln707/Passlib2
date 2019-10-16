@@ -5,7 +5,7 @@
 
 .. rst-class:: float-right
 
-.. seealso:: :ref:`What's new in Passlib 1.7 <whats-new>`
+.. seealso:: :ref:`What's new in Passlib 1.8 <whats-new>`
 
 ==========================================
 Passlib |release| documentation
@@ -18,6 +18,14 @@ Passlib |release| documentation
         This is the documentation for a development version of Passlib.
         For documentation of the latest stable version,
         see `<https://passlib.readthedocs.io>`_.
+
+.. only:: pypi
+
+   .. warning::
+
+        The official Passlib documentation have moved to `<https://passlib.readthedocs.io>`_.
+        Documentation at this location is still being maintained,
+        but will be updated much less frequently.
 
 Welcome
 =======

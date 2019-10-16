@@ -12,7 +12,6 @@ from passlib import apache
 from passlib.exc import MissingBackendError
 from passlib.utils.compat import irange
 from passlib.tests.utils import TestCase, get_file, set_file, ensure_mtime_changed
-from passlib.utils.compat import u
 from passlib.utils import to_bytes
 # module
 log = getLogger(__name__)
@@ -63,8 +62,8 @@ class HtpasswdFileTest(TestCase):
                  b'user6:$5$rounds=110000$cCRp/xUUGVgwR4aP$'
                      b'p0.QKFS5qLNRqw1/47lXYiAcgIjJK.WjCO8nrEKuUK.\n')
 
-    def test_00_constructor_autoload(self):
-        """test constructor autoload"""
+    def test_00_constructor_new(self):
+        """constructor -- 'new' keyword"""
         # check with existing file
         path = self.mktemp()
         set_file(path, self.sample_01)
@@ -80,13 +79,6 @@ class HtpasswdFileTest(TestCase):
 
         # check new=True
         ht = apache.HtpasswdFile(path, new=True)
-        self.assertEqual(ht.to_string(), b"")
-        self.assertEqual(ht.path, path)
-        self.assertFalse(ht.mtime)
-
-        # check autoload=False (deprecated alias for new=True)
-        with self.assertWarningList("``autoload=False`` is deprecated"):
-            ht = apache.HtpasswdFile(path, autoload=False)
         self.assertEqual(ht.to_string(), b"")
         self.assertEqual(ht.path, path)
         self.assertFalse(ht.mtime)
@@ -137,20 +129,8 @@ class HtpasswdFileTest(TestCase):
         self.assertFalse(ht.set_password("user5", "pass5"))
         self.assertEqual(ht.to_string(), self.sample_03)
 
-        # test legacy default kwd
-        with self.assertWarningList("``default`` is deprecated"):
-            ht = apache.HtpasswdFile.from_string(self.sample_01, default="plaintext")
-        self.assertTrue(ht.set_password("user2", "pass2x"))
-        self.assertFalse(ht.set_password("user5", "pass5"))
-        self.assertEqual(ht.to_string(), self.sample_03)
-
         # invalid user
         self.assertRaises(ValueError, ht.set_password, "user:", "pass")
-
-        # test that legacy update() still works
-        with self.assertWarningList("update\(\) is deprecated"):
-            ht.update("user2", "test")
-        self.assertTrue(ht.check_password("user2", "test"))
 
     def test_02_set_password_autosave(self):
         path = self.mktemp()
@@ -216,11 +196,6 @@ class HtpasswdFileTest(TestCase):
                 raise
 
         self.assertRaises(ValueError, ht.check_password, "user:", "pass")
-
-        # test that legacy verify() still works
-        with self.assertWarningList(["verify\(\) is deprecated"]*2):
-            self.assertTrue(ht.verify("user1", "pass1"))
-            self.assertFalse(ht.verify("user1", "pass2"))
 
     def test_05_load(self):
         """test load()"""
@@ -289,17 +264,16 @@ class HtpasswdFileTest(TestCase):
         # check sample utf-8
         ht = apache.HtpasswdFile.from_string(self.sample_04_utf8, encoding="utf-8",
                                              return_unicode=True)
-        self.assertEqual(ht.users(), [ u("user\u00e6") ])
+        self.assertEqual(ht.users(), [ u"user\u00e6" ])
 
-        # test deprecated encoding=None
-        with self.assertWarningList("``encoding=None`` is deprecated"):
-            ht = apache.HtpasswdFile.from_string(self.sample_04_utf8, encoding=None)
-        self.assertEqual(ht.users(), [ b'user\xc3\xa6' ])
+        # encoding=None should throw error
+        self.assertRaises(TypeError, apache.HtpasswdFile.from_string,
+                          self.sample_04_utf8, encoding=None)
 
         # check sample latin-1
         ht = apache.HtpasswdFile.from_string(self.sample_04_latin1,
                                               encoding="latin-1", return_unicode=True)
-        self.assertEqual(ht.users(), [ u("user\u00e6") ])
+        self.assertEqual(ht.users(), [ u"user\u00e6" ])
 
     def test_08_get_hash(self):
         """test get_hash()"""
@@ -307,9 +281,6 @@ class HtpasswdFileTest(TestCase):
         self.assertEqual(ht.get_hash("user3"), b"{SHA}3ipNV1GrBtxPmHFC21fCbVCSXIo=")
         self.assertEqual(ht.get_hash("user4"), b"pass4")
         self.assertEqual(ht.get_hash("user5"), None)
-
-        with self.assertWarningList("find\(\) is deprecated"):
-            self.assertEqual(ht.find("user4"), b"pass4")
 
     def test_09_to_string(self):
         """test to_string"""
@@ -484,11 +455,6 @@ class HtdigestFileTest(TestCase):
         self.assertRaises(ValueError, ht.set_password, "user", "realm:", "pass")
         self.assertRaises(ValueError, ht.set_password, "user", "r"*256, "pass")
 
-        # test that legacy update() still works
-        with self.assertWarningList("update\(\) is deprecated"):
-            ht.update("user2", "realm2", "test")
-        self.assertTrue(ht.check_password("user2", "test"))
-
     # TODO: test set_password autosave
 
     def test_03_users(self):
@@ -517,11 +483,6 @@ class HtdigestFileTest(TestCase):
         ht.default_realm = "realm"
         self.assertTrue(ht.check_password("user1", "pass1"))
         self.assertIs(ht.check_password("user5", "pass5"), None)
-
-        # test that legacy verify() still works
-        with self.assertWarningList(["verify\(\) is deprecated"]*2):
-            self.assertTrue(ht.verify("user1", "realm", "pass1"))
-            self.assertFalse(ht.verify("user1", "realm", "pass2"))
 
         # invalid user
         self.assertRaises(ValueError, ht.check_password, "user:", "realm", "pass")
@@ -559,13 +520,6 @@ class HtdigestFileTest(TestCase):
         hc = apache.HtdigestFile()
         hc.load(path)
         self.assertEqual(hc.to_string(), self.sample_01)
-
-        # change file, test deprecated force=False kwd
-        ensure_mtime_changed(path)
-        set_file(path, "")
-        with self.assertWarningList(r"load\(force=False\) is deprecated"):
-            ha.load(force=False)
-        self.assertEqual(ha.to_string(), b"")
 
     def test_06_save(self):
         """test save()"""
@@ -607,9 +561,6 @@ class HtdigestFileTest(TestCase):
         self.assertEqual(ht.get_hash("user4", "realm"), "ab7b5d5f28ccc7666315f508c7358519")
         self.assertEqual(ht.get_hash("user5", "realm"), None)
 
-        with self.assertWarningList("find\(\) is deprecated"):
-            self.assertEqual(ht.find("user4", "realm"), "ab7b5d5f28ccc7666315f508c7358519")
-
     def test_09_encodings(self):
         """test encoding parameter"""
         # test bad encodings cause failure in constructor
@@ -617,13 +568,13 @@ class HtdigestFileTest(TestCase):
 
         # check sample utf-8
         ht = apache.HtdigestFile.from_string(self.sample_04_utf8, encoding="utf-8", return_unicode=True)
-        self.assertEqual(ht.realms(), [ u("realm\u00e6") ])
-        self.assertEqual(ht.users(u("realm\u00e6")), [ u("user\u00e6") ])
+        self.assertEqual(ht.realms(), [ u"realm\u00e6" ])
+        self.assertEqual(ht.users(u"realm\u00e6"), [ u"user\u00e6" ])
 
         # check sample latin-1
         ht = apache.HtdigestFile.from_string(self.sample_04_latin1, encoding="latin-1", return_unicode=True)
-        self.assertEqual(ht.realms(), [ u("realm\u00e6") ])
-        self.assertEqual(ht.users(u("realm\u00e6")), [ u("user\u00e6") ])
+        self.assertEqual(ht.realms(), [ u"realm\u00e6" ])
+        self.assertEqual(ht.users(u"realm\u00e6"), [ u"user\u00e6" ])
 
     def test_10_to_string(self):
         """test to_string()"""

@@ -30,7 +30,7 @@ from passlib import exc
 from passlib.crypto.digest import MAX_UINT32
 from passlib.utils import to_bytes
 from passlib.utils.binary import b64s_encode, b64s_decode
-from passlib.utils.compat import u, unicode, bascii_to_str
+from passlib.utils.compat import unicode, bascii_to_str
 import passlib.utils.handlers as uh
 # local
 __all__ = [
@@ -63,6 +63,8 @@ else:
         time_cost = 2
         memory_cost = 512
         parallelism = 2
+        salt_len = 16
+        hash_len = 16
     _default_version = 0x13
 
 #=============================================================================
@@ -107,17 +109,16 @@ class _Argon2Common(uh.SubclassBackendMixin, uh.ParallelismMixin,
     #------------------------
     # GenericHandler
     #------------------------
-    ident = u("$argon2i")
-    # NOTE: ignoring argon2_cffi's default of 16, to better match libargon2
-    checksum_size = 32
+    ident = u"$argon2i"
+    checksum_size = _default_settings.hash_len
 
     # NOTE: from_string() relies on the ordering of these...
-    ident_values = (u("$argon2i$"), u("$argon2d$"))
+    ident_values = (u"$argon2i$", u"$argon2d$")
 
     #------------------------
     # HasSalt
     #------------------------
-    default_salt_size = 16
+    default_salt_size = _default_settings.salt_len
     min_salt_size = 8
     max_salt_size = MAX_UINT32
 

@@ -166,36 +166,6 @@ Options which directly affect the behavior of the CryptContext instance:
 
     .. versionadded:: 1.7
 
-.. _context-min-verify-time-option:
-
-``min_verify_time``
-
-    If specified, unsuccessful :meth:`~CryptContext.verify`
-    calls will be penalized, and take at least this may
-    seconds before the method returns. May be an integer
-    or fractional number of seconds.
-
-    .. deprecated:: 1.6
-        This option has not proved very useful, is ignored by 1.7,
-        and will be removed in version 1.8.
-
-    .. versionchanged:: 1.7
-
-        Per deprecation roadmap above, this option is now ignored.
-
-.. _context-harden-verify-option:
-
-``harden_verify``
-
-    Companion to ``min_verify_time``, currently ignored.
-
-    .. versionadded:: 1.7
-
-    .. deprecated:: 1.7.1
-
-        This option is ignored by 1.7.1, and will be removed in 1.8
-        along with ``min_verify_time``.
-
 .. _context-algorithm-options:
 
 Algorithm Options

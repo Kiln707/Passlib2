@@ -6,6 +6,7 @@ parsing was being sped up. it could definitely be improved.
 #=============================================================================
 # init script env
 #=============================================================================
+from __future__ import absolute_import, division, print_function
 import re
 import os, sys
 root = os.path.join(os.path.dirname(__file__), os.path.pardir)
@@ -24,7 +25,7 @@ try:
 except ImportError:
     PasslibConfigWarning = None
 import passlib.utils.handlers as uh
-from passlib.utils.compat import u, print_, unicode
+from passlib.utils.compat import unicode
 from passlib.tests.utils import time_call
 # local
 
@@ -78,10 +79,10 @@ class benchmark:
         usec = int(secs * 1e6)
         if usec < 1000:
             return "%.*g usec" % (precision, usec)
-        msec = usec / 1000
+        msec = usec // 1000
         if msec < 1000:
             return "%.*g msec" % (precision, msec)
-        sec = msec / 1000
+        sec = msec // 1000
         return "%.*g sec" % (precision, sec)
 
 #=============================================================================
@@ -90,19 +91,15 @@ class benchmark:
 sample_config_1p = os.path.join(root, "passlib", "tests", "sample_config_1s.cfg")
 
 from passlib.context import CryptContext
-if hasattr(CryptContext, "from_path"):
-    CryptPolicy = None
-else:
-    from passlib.context import CryptPolicy
 
 class BlankHandler(uh.HasRounds, uh.HasSalt, uh.GenericHandler):
     name = "blank"
-    ident = u("$b$")
+    ident = u"$b$"
     setting_kwds = ("rounds", "salt", "salt_size")
 
     checksum_size = 1
     min_salt_size = max_salt_size = 1
-    salt_chars = u("a")
+    salt_chars = u"a"
 
     min_rounds = 1000
     max_rounds = 3000
@@ -121,10 +118,10 @@ class BlankHandler(uh.HasRounds, uh.HasSalt, uh.GenericHandler):
 
 class AnotherHandler(BlankHandler):
     name = "another"
-    ident = u("$a$")
+    ident = u"$a$"
 
-SECRET = u("toomanysecrets")
-OTHER =  u("setecastronomy")
+SECRET = u"toomanysecrets"
+OTHER =  u"setecastronomy"
 
 #=============================================================================
 # CryptContext benchmarks
@@ -133,12 +130,8 @@ OTHER =  u("setecastronomy")
 def test_context_from_path():
     """test speed of CryptContext.from_path()"""
     path = sample_config_1p
-    if CryptPolicy:
-        def helper():
-            CryptPolicy.from_path(path)
-    else:
-        def helper():
-            CryptContext.from_path(path)
+    def helper():
+        CryptContext.from_path(path)
     return helper
 
 @benchmark.constructor()
@@ -150,14 +143,9 @@ def test_context_update():
         deprecated = [ "des_crypt" ],
         sha512_crypt__min_rounds=4000,
         )
-    if CryptPolicy:
-        policy=CryptPolicy.from_path(sample_config_1p)
-        def helper():
-            policy.replace(**kwds)
-    else:
-        ctx = CryptContext.from_path(sample_config_1p)
-        def helper():
-            ctx.copy(**kwds)
+    ctx = CryptContext.from_path(sample_config_1p)
+    def helper():
+        ctx.copy(**kwds)
     return helper
 
 @benchmark.constructor()
@@ -306,7 +294,7 @@ def main(*args):
                      if any(re.match(arg, k) for arg in args))
     helper = benchmark.run(source, maxtime=2, bestof=3)
     for name, secs, precision in helper:
-        print_("%-50s %9s (%d)" % (name, benchmark.pptime(secs), precision))
+        print("%-50s %9s (%d)" % (name, benchmark.pptime(secs), precision))
 
 if __name__ == "__main__":
     import sys

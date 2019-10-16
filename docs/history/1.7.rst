@@ -1,13 +1,6 @@
-.. _whats-new:
-
 ===========
 Passlib 1.7
 ===========
-
-**1.7.2** (NOT YET RELEASED)
-============================
-
-* :class:`~passlib.hash.argon` -- default hash size increased to 32 bytes (:issue:`88`).
 
 **1.7.1** (2017-1-30)
 =====================
@@ -327,7 +320,7 @@ Changes in existing behavior:
 
 Scheduled removal of features:
 
-    * **[minor]** :mod:`passlib.context`: The :ref:`min_verify_time <context-min-verify-time-option>` keyword
+    * **[minor]** :mod:`passlib.context`: The ``min_verify_time`` keyword
       that was deprecated in release 1.6, is now completely ignored.
       Support will be removed entirely in release 1.8.
 

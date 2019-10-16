@@ -14,7 +14,7 @@ from passlib.context import CryptContext
 from passlib.ext.django.utils import (
     DJANGO_VERSION, MIN_DJANGO_VERSION, DjangoTranslator,
 )
-from passlib.utils.compat import iteritems, get_method_function, u
+from passlib.utils.compat import iteritems, get_method_function
 from passlib.utils.decor import memoized_property
 # tests
 from passlib.tests.utils import TestCase, TEST_MODE, handler_derived_from
@@ -607,9 +607,9 @@ class DjangoExtensionTest(_ExtensionTest):
         self.load_extension(PASSLIB_CONFIG="disabled", check=False)
         self.assert_unpatched()
 
-        # check legacy config=None
-        with self.assertWarningList("PASSLIB_CONFIG=None is deprecated"):
-            self.load_extension(PASSLIB_CONFIG=None, check=False)
+        # check onfig=None is rejected
+        self.assertRaises(TypeError, self.load_extension, PASSLIB_CONFIG=None,
+                          check=False)
         self.assert_unpatched()
 
         # try stock django 1.0 context
@@ -689,9 +689,9 @@ class DjangoExtensionTest(_ExtensionTest):
                                   "v2RWkZQzctPdejyRqmmTDQpZN6wTh7.RUy9zF2LftT6")
         self.assertEqual(hasher.safe_summary(encoded),
             {'algorithm': 'sha256_crypt',
-             'salt': u('abcdab**********'),
+             'salt': u'abcdab**********',
              'rounds': 1234,
-             'hash': u('v2RWkZ*************************************'),
+             'hash': u'v2RWkZ*************************************',
              })
 
     #===================================================================
@@ -699,9 +699,9 @@ class DjangoExtensionTest(_ExtensionTest):
     #===================================================================
     def test_11_config_disabled(self):
         """test PASSLIB_CONFIG='disabled'"""
-        # test config=None (deprecated)
-        with self.assertWarningList("PASSLIB_CONFIG=None is deprecated"):
-            self.load_extension(PASSLIB_CONFIG=None, check=False)
+        # test config=None is rejected
+        self.assertRaises(TypeError, self.load_extension, PASSLIB_CONFIG=None,
+                          check=False)
         self.assert_unpatched()
 
         # test disabled config
