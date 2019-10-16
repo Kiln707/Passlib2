@@ -1,5 +1,5 @@
 """
-passlib setup script
+passlib2 setup script
 
 This script honors one environmental variable:
 SETUP_TAG_RELEASE
@@ -28,21 +28,21 @@ opts = dict(
     #==================================================================
     packages=setuptools.find_packages(root_dir),
     package_data={
-        "passlib.tests": ["*.cfg"],
-        "passlib": ["_data/wordsets/*.txt"],
+        "passlib2.tests": ["*.cfg"],
+        "passlib2": ["_data/wordsets/*.txt"],
     },
     zip_safe=True,
 
     #==================================================================
     # metadata
     #==================================================================
-    name="passlib",
+    name="passlib2",
     # NOTE: 'version' set below
-    author="Eli Collins",
-    author_email="elic@assurancetechnologies.com",
+    author="Eli Collins, Steven Swanson",
+    author_email="Kiln707Development@gmail.com",
     license="BSD",
 
-    url="https://bitbucket.org/ecollins/passlib",
+    url="https://github.com/Kiln707/Passlib2",
     # NOTE: 'download_url' set below
 
     extras_require={
@@ -58,24 +58,23 @@ opts = dict(
     "comprehensive password hashing framework supporting over 30 schemes",
 
     long_description="""\
-Passlib is a password hashing library for Python 2 & 3, which provides
+Passlib2 is a password hashing library for Python 3, which provides
 cross-platform implementations of over 30 password hashing algorithms, as well
 as a framework for managing existing password hashes. It's designed to be useful
 for a wide range of tasks, from verifying a hash found in /etc/shadow, to
 providing full-strength password hashing for multi-user applications.
-
-* See the `documentation <https://passlib.readthedocs.io>`_
-  for details, installation instructions, and examples.
-
-* See the `homepage <https://bitbucket.org/ecollins/passlib>`_
-  for the latest news and more information.
-
-* See the `changelog <https://passlib.readthedocs.io/en/stable/history>`_
-  for a description of what's new in Passlib.
-
-All releases are signed with the gpg key
-`4D8592DF4CE1ED31 <http://pgp.mit.edu:11371/pks/lookup?op=get&search=0x4D8592DF4CE1ED31>`_.
 """,
+#* See the `documentation <https://passlib.readthedocs.io>`_
+#  for details, installation instructions, and examples.
+
+#* See the `homepage <https://bitbucket.org/ecollins/passlib>`_
+#  for the latest news and more information.
+
+#* See the `changelog <https://passlib.readthedocs.io/en/stable/history>`_
+#  for a description of what's new in Passlib.
+
+#All releases are signed with the gpg key
+#`4D8592DF4CE1ED31 <http://pgp.mit.edu:11371/pks/lookup?op=get&search=0x4D8592DF4CE1ED31>`_.
 
     keywords="""\
 password secret hash security
@@ -98,6 +97,8 @@ Programming Language :: Python :: 3.3
 Programming Language :: Python :: 3.4
 Programming Language :: Python :: 3.5
 Programming Language :: Python :: 3.6
+Programming Language :: Python :: 3.7
+Programming Language :: Python :: 3.8
 Programming Language :: Python :: Implementation :: CPython
 Programming Language :: Python :: Implementation :: Jython
 Programming Language :: Python :: Implementation :: PyPy
@@ -126,12 +127,12 @@ Topic :: Software Development :: Libraries
 #=============================================================================
 
 # pull version string from passlib
-from passlib import __version__ as version
+from passlib2 import __version__ as version
 
 # append hg revision to builds
 stamp_build = True  # NOTE: modified by stamp_distutils_output()
 if stamp_build:
-    from passlib._setup.stamp import (
+    from passlib2._setup.stamp import (
         as_bool, append_hg_revision, stamp_distutils_output,
         install_build_py_exclude, set_command_options
     )
@@ -147,7 +148,7 @@ if stamp_build:
     # exclude 'passlib._setup' from builds, only needed for sdist
     install_build_py_exclude(opts)
     set_command_options(opts, "build_py",
-        exclude_packages=["passlib._setup"],
+        exclude_packages=["passlib2._setup"],
     )
 
 opts['version'] = version

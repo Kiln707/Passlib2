@@ -9,8 +9,8 @@ import logging; log = logging.getLogger(__name__)
 import sys
 # site
 # pkg
-from passlib.registry import get_crypt_handler
-from passlib.utils import tick
+from passlib2.registry import get_crypt_handler
+from passlib2.utils import tick
 # local
 __all__ = [
     "main",
